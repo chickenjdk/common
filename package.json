@@ -1,6 +1,6 @@
 {
   "name": "@chickenjdk/common",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": " Common utils for chickenjdk stuff ",
   "main": "dist/index.js",
   "scripts": {
@@ -11,8 +11,7 @@
     "url": "git+https://github.com/chickenjdk/common.git"
   },
   "keywords": [
-    "java",
-    "Class file"
+    "Utils"
   ],
   "author": "chickenjdk",
   "license": "MIT",
