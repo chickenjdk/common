@@ -4,7 +4,8 @@
   "description": " Common utils for chickenjdk stuff ",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "docs": "typedoc --options typedoc.json"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,7 @@
   "homepage": "https://github.com/chickenjdk/common#readme",
   "devDependencies": {
     "@types/node": "^22.10.1",
+    "typedoc": "^0.28.5",
     "typescript": "^5.7.2"
   }
 }

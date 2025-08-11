@@ -1,5 +1,3 @@
-import { inspect } from "util";
-
 // Join tuple of strings with deleminator
 export type Concantate<
   Tuple extends string[],
@@ -14,8 +12,21 @@ export type Concantate<
 export type NoFunc<T> = { [K in keyof T]: keyof T };
 // Errors
 type error = typeof Error;
-const chains: WeakMap<any, string[]> = new WeakMap();
+const chains: WeakMap<any, [string[], number[]]> = new WeakMap();
 export type pop<T extends any[]> = T extends [any, infer R] ? R : [];
+// Colors!
+const { enableColors = true } = process.env;
+const colorList = [
+  11, 13, 14, 26, 36, 56, 61, 71, 75, 76, 85, 126, 131, 135, 136, 155, 159, 165,
+  190, 205, 215, 219, 229,
+];
+function stringToIndex(str: string, listLength: number): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 31 + str.charCodeAt(i)) >>> 0; // unsigned 32-bit
+  }
+  return hash % listLength;
+}
 // You can never over-type!
 export function createClassifyedError<
   reason extends string,
@@ -30,20 +41,34 @@ export function createClassifyedError<
   // @ts-ignore
   isFatal: isFatal = true
 ): NoFunc<oldError> &
-  ((...args: ConstructorParameters<oldError>) => Omit<InstanceType<oldError>,"isFatal"> & {
+  ((...args: ConstructorParameters<oldError>) => Omit<
+    InstanceType<oldError>,
+    "isFatal"
+  > & {
     reasonChain: string[];
     isFatal: isFatal;
   }) & {
-    new (...args: ConstructorParameters<oldError>): Omit<InstanceType<oldError>,"isFatal"> & {
+    new (...args: ConstructorParameters<oldError>): Omit<
+      InstanceType<oldError>,
+      "isFatal"
+    > & {
       reasonChain: string[];
       isFatal: isFatal;
     };
   } {
-  let chain = [reason as string];
+  const chain: string[] = [reason];
   if (chains.has(oldError)) {
-    chain.unshift(...(chains.get(oldError) as string[]));
+    chain.unshift(...(chains.get(oldError) as [string[], number[]])[0]);
   }
-  const prepend = chain.map((reason) => `[${reason}]`).join(" ");
+  let color: number;
+  const thisColorList = chains.has(oldError) ? (chains.get(oldError) as [string[], number[]])[1]:colorList;
+  if (enableColors) {
+    color = thisColorList[stringToIndex(reason, thisColorList.length)];
+  }
+  // @ts-ignore
+  const prepend = `[${enableColors ? `\x1b[38;5;${color};1m` : ""}${reason}${
+    enableColors ? "\x1b[0m" : ""
+  }]`;
   // @ts-ignore
   class classifyedError extends oldError {
     constructor(message: string, ...params: pop<Parameters<error>>) {
@@ -66,6 +91,10 @@ export function createClassifyedError<
     writable: false,
     value: isFatal,
   });
+  chains.set(classifyedError, [
+    chain,
+    enableColors ? thisColorList.length > 1 ? thisColorList.filter((value) => value !== color) : colorList : [],
+  ]);
   // @ts-ignore
   return classifyedError;
 }
@@ -89,38 +118,3 @@ export function errorFuncWrap<assertFunc extends [(...args: any[]) => any]>(
   };
 }
 export const chickenJVMError = createClassifyedError("ChickenJVM ERROR");
-const levelList = [
-  "error",
-  "warning",
-  "reasonable",
-  "verbose",
-  "dumb",
-] as const;
-const colors: number[] & { length: typeof levelList.length } = [
-  31, 33, 32, 34, 37,
-];
-const { loglevel } = process.env;
-const levels =
-  typeof loglevel === "string" && loglevel in Object.values(levelList)
-    ? levelList.slice(
-        0,
-        levelList.indexOf(loglevel as (typeof levelList)[number]) + 1
-      )
-    : [];
-export function log(
-  level: (typeof levelList)[number],
-  value: string | Error
-): void {
-  if (levels.includes(level)) {
-    process.stdout.write(
-      `[\x1b[${colors[levels.indexOf(level)]};1m${level}\x1b[0m] ${inspect(
-        value,
-        { colors: true }
-      )}`
-    );
-  }
-  // @ts-ignore
-  if (value.isFatal === true) {
-    throw value;
-  }
-}
