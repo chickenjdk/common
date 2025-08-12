@@ -1,4 +1,4 @@
-// Join tuple of strings with deleminator
+// Join tuple of strings with delimiter
 export type Concantate<
   Tuple extends string[],
   Seperator extends string = "",
@@ -8,9 +8,9 @@ export type Concantate<
   : Tuple extends [infer start extends string, ...infer rest extends string[]]
   ? Concantate<rest, Seperator, `${Rest}${start}${Seperator}`>
   : never;
-// Remove functions
+// Remove functions.
 export type NoFunc<T> = { [K in keyof T]: keyof T };
-// Errors
+// Errors.
 type error = typeof Error;
 const chains: WeakMap<any, [string[], number[]]> = new WeakMap();
 export type pop<T extends any[]> = T extends [any, infer R] ? R : [];
@@ -27,7 +27,14 @@ function stringToIndex(str: string, listLength: number): number {
   }
   return hash % listLength;
 }
-// You can never over-type!
+// You can never overtype!
+/**
+ * Create a classified error class that extends the oldError to add fancy classification prepended text and adds the reasonChain and isFatal properties.
+ * @param reason The error reason
+ * @param oldError The old error class to extend. Defaults to Error.
+ * @param isFatal If the error is fatal. Defaults to true.
+ * @returns The new error class that extends the oldError with the reasonChain and isFatal properties.
+ */
 export function createClassifyedError<
   reason extends string,
   isFatal extends boolean = true,
@@ -40,28 +47,23 @@ export function createClassifyedError<
   oldError: oldError = Error,
   // @ts-ignore
   isFatal: isFatal = true
-): NoFunc<oldError> &
-  ((...args: ConstructorParameters<oldError>) => Omit<
+): NoFunc<oldError> & {
+  new (...args: ConstructorParameters<oldError>): Omit<
     InstanceType<oldError>,
     "isFatal"
   > & {
     reasonChain: string[];
     isFatal: isFatal;
-  }) & {
-    new (...args: ConstructorParameters<oldError>): Omit<
-      InstanceType<oldError>,
-      "isFatal"
-    > & {
-      reasonChain: string[];
-      isFatal: isFatal;
-    };
-  } {
+  };
+} {
   const chain: string[] = [reason];
   if (chains.has(oldError)) {
     chain.unshift(...(chains.get(oldError) as [string[], number[]])[0]);
   }
   let color: number;
-  const thisColorList = chains.has(oldError) ? (chains.get(oldError) as [string[], number[]])[1]:colorList;
+  const thisColorList = chains.has(oldError)
+    ? (chains.get(oldError) as [string[], number[]])[1]
+    : colorList;
   if (enableColors) {
     color = thisColorList[stringToIndex(reason, thisColorList.length)];
   }
@@ -78,7 +80,7 @@ export function createClassifyedError<
   const descriptors = Object.getOwnPropertyDescriptors(oldError);
   delete descriptors.prototype;
   Object.defineProperties(classifyedError, descriptors);
-  // Must be non-enumerable so it will not show in error message.
+  // Must be non-enumerable so it will not show in the error message.
   Object.defineProperty(classifyedError.prototype, "reasonChain", {
     configurable: false,
     enumerable: false,
@@ -93,13 +95,23 @@ export function createClassifyedError<
   });
   chains.set(classifyedError, [
     chain,
-    enableColors ? thisColorList.length > 1 ? thisColorList.filter((value) => value !== color) : colorList : [],
+    enableColors
+      ? thisColorList.length > 1
+        ? thisColorList.filter((value) => value !== color)
+        : colorList
+      : [],
   ]);
   // @ts-ignore
   return classifyedError;
 }
-// Wrap error-generating functions to change the type of error that it throws and optionaly prepend its message
-// assertFunc is in an array to prevent type widening
+// assertFunc is in an array to prevent type widening.
+/**
+ * Wrap error-generating functions to change the type of error that it throws and optionally prepend its message
+ * @param assertFunc The assertion function to wrap. It should throw an error if the assertion fails.
+ * @param customError The custom error class to throw instead of the original error. Defaults to Error.
+ * @param prependErrorWith Text to prepend to the error message. Defaults to an empty string.
+ * @returns A wrapped version of the assertFunc that throws the customError with the prepended message.
+ */
 export function errorFuncWrap<assertFunc extends [(...args: any[]) => any]>(
   assertFunc: assertFunc[0],
   customError: { new (message: string): any } = Error,

@@ -26,7 +26,7 @@ export function getDefaultLogLevel() {
   return defaultLevel;
 }
 // Making the level list
-const { loglevel, enableColors = true} = process.env;
+const { loglevel, enableColors = true } = process.env;
 function evaluateLevels() {
   return (() => {
     // @ts-ignore
@@ -62,7 +62,9 @@ export function log(
 ): void {
   if (levels.includes(level)) {
     process.stdout.write(
-      `[${enableColors ? `\x1b[${colors[levels.indexOf(level)]};1m` : ""}${level}${enableColors ? "\x1b[0m" : ""}] ${
+      `[${
+        enableColors ? `\x1b[${colors[levels.indexOf(level)]};1m` : ""
+      }${level}${enableColors ? "\x1b[0m" : ""}] ${
         inspectValue ? inspect(value, { colors: true }) : value
       }`
     );
