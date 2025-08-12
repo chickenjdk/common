@@ -1,3 +1,5 @@
+import { range } from "./types";
+
 export class prioritizedHook {
   #listeners: ((...args: any[]) => void)[][] = [];
   addListener(priority: number, eventListener: (...args: any[]) => void): void {
@@ -12,18 +14,6 @@ export class prioritizedHook {
     }
   }
 }
-export type countingArray<
-  length extends number,
-  temp extends number[] = []
-> = length extends temp["length"]
-  ? temp
-  : countingArray<length, [...temp, temp["length"]]>;
-export type oneExtra<T extends number[]> = [...T, T["length"]];
-export type range<from extends number, to extends number> = Exclude<
-  oneExtra<countingArray<to>>[number],
-  // @ts-ignore
-  countingArray<from>[number]
->;
 export function assertInRange<
   const expectedRange extends [number, number],
   rangeUnion extends number = range<expectedRange[0], expectedRange[1]>
