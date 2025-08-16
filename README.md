@@ -2,7 +2,7 @@
 Common utils for chickenjdk stuff.
 
 ## Docs
-[See docs](https://chickenjdk.github.io/common/docs/v2.0.1)
+[See docs](https://chickenjdk.github.io/common/docs/v2.0.2)
 
 ## Uses
 Includes logging and creating custom errors.
