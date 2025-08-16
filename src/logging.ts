@@ -66,7 +66,7 @@ export function log(
         enableColors ? `\x1b[${colors[levels.indexOf(level)]};1m` : ""
       }${level}${enableColors ? "\x1b[0m" : ""}] ${
         inspectValue ? inspect(value, { colors: true }) : value
-      }`
+      }\n`
     );
   }
   // @ts-ignore
