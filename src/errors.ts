@@ -1,12 +1,12 @@
 // Join tuple of strings with delimiter
 export type Concantate<
   Tuple extends string[],
-  Seperator extends string = "",
+  Separator extends string = "",
   Rest extends string = ""
 > = Tuple["length"] extends 1
   ? `${Rest}${Tuple[0]}`
   : Tuple extends [infer start extends string, ...infer rest extends string[]]
-  ? Concantate<rest, Seperator, `${Rest}${start}${Seperator}`>
+  ? Concantate<rest, Separator, `${Rest}${start}${Separator}`>
   : never;
 // Remove functions.
 export type NoFunc<T> = { [K in keyof T]: keyof T };
@@ -27,7 +27,7 @@ function stringToIndex(str: string, listLength: number): number {
   }
   return hash % listLength;
 }
-// You can never overtype!
+// You can never over-type!
 /**
  * Create a classified error class that extends the oldError to add fancy classification prepended text and adds the reasonChain and isFatal properties.
  * @param reason The error reason
@@ -35,7 +35,7 @@ function stringToIndex(str: string, listLength: number): number {
  * @param isFatal If the error is fatal. Defaults to true.
  * @returns The new error class that extends the oldError with the reasonChain and isFatal properties.
  */
-export function createClassifyedError<
+export function createClassifiedError<
   reason extends string,
   isFatal extends boolean = true,
   oldError extends {
@@ -72,28 +72,28 @@ export function createClassifyedError<
     enableColors ? "\x1b[0m" : ""
   }]`;
   // @ts-ignore
-  class classifyedError extends oldError {
+  class classifiedError extends oldError {
     constructor(message: string, ...params: pop<Parameters<error>>) {
       super(prepend + " " + message, ...params);
     }
   }
   const descriptors = Object.getOwnPropertyDescriptors(oldError);
   delete descriptors.prototype;
-  Object.defineProperties(classifyedError, descriptors);
+  Object.defineProperties(classifiedError, descriptors);
   // Must be non-enumerable so it will not show in the error message.
-  Object.defineProperty(classifyedError.prototype, "reasonChain", {
+  Object.defineProperty(classifiedError.prototype, "reasonChain", {
     configurable: false,
     enumerable: false,
     writable: false,
     value: chain,
   });
-  Object.defineProperty(classifyedError.prototype, "isFatal", {
+  Object.defineProperty(classifiedError.prototype, "isFatal", {
     configurable: false,
     enumerable: false,
     writable: false,
     value: isFatal,
   });
-  chains.set(classifyedError, [
+  chains.set(classifiedError, [
     chain,
     enableColors
       ? thisColorList.length > 1
@@ -102,8 +102,13 @@ export function createClassifyedError<
       : [],
   ]);
   // @ts-ignore
-  return classifyedError;
+  return classifiedError;
 }
+/**
+ * @deprecated Use createClassifiedError instead. Removal scheduled for v3, as it is misspelled. 
+ */
+const createClassifyedError = createClassifiedError;
+
 // assertFunc is in an array to prevent type widening.
 /**
  * Wrap error-generating functions to change the type of error that it throws and optionally prepend its message
@@ -129,4 +134,4 @@ export function errorFuncWrap<assertFunc extends [(...args: any[]) => any]>(
     }
   };
 }
-export const chickenJVMError = createClassifyedError("ChickenJVM ERROR");
+export const chickenJVMError = createClassifiedError("ChickenJVM ERROR");

@@ -48,12 +48,12 @@ function evaluateLevels() {
 }
 let levels = evaluateLevels();
 
-// Actualy log
+// Actually log
 /**
  * Log a value. WIll trow and log the value if it is an Error and the isFatal property is true
  * @param level The logging level
  * @param value The value to log. It will be printed in the form reported by util.inspect if inspectValue is not provided and set to false
- * @param [inspectValue=true] If true, use util.inspect to spow the value
+ * @param [inspectValue=true] If true, use util.inspect to show the value
  */
 export function log(
   level: (typeof levelList)[number],

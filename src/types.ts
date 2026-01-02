@@ -34,8 +34,8 @@ export type and<A extends boolean, B extends boolean> = A extends true
  */
 export type not<T extends boolean> = T extends true ? false : true;
 /**
- * Expand an object or array type, iterating recursivly over all of the elements down to string/number/symbol in order to turn a type containing others into the most basic form, except those that match the Ignore type.
- * Mainly used to help with making docs and IDEs display inteligable types, even for the most spaghetti of types and code.
+ * Expand an object or array type, iterating recursively over all of the elements down to string/number/symbol in order to turn a type containing others into the most basic form, except those that match the Ignore type.
+ * Mainly used to help with making docs and IDEs display intelligible types, even for the most spaghetti of types and code.
  */
 export type Expand<
   O,
@@ -90,7 +90,7 @@ export type ContainsWider<T, U> =
     ? false
     : true;
 /**
- * For unions containing ovverlapping types, this type will remove all types that are a wider version of any of the other types in the union, leaving only the narrowest types.
+ * For unions containing overlapping types, this type will remove all types that are a wider version of any of the other types in the union, leaving only the narrowest types.
  */
 export type Narrowest<T, U = T> =
   // Map over T

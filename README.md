@@ -5,12 +5,12 @@ Common utils for chickenjdk stuff.
 [See docs](https://chickenjdk.github.io/common/docs/v2.0.2)
 
 ## Uses
-Includes logging and creating custom errors.
+Includes logging and creating fancy errors.
 
 Logging:
 
-![Console output](images/exsample1.png)
+![Console output](images/example1.png)
 
 Errors:
 
-![Console output](images/exsample2.png)
+![Console output](images/example2.png)
