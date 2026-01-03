@@ -107,7 +107,7 @@ export function createClassifiedError<
 /**
  * @deprecated Use createClassifiedError instead. Removal scheduled for v3, as it is misspelled. 
  */
-const createClassifyedError = createClassifiedError;
+export const createClassifyedError = createClassifiedError;
 
 // assertFunc is in an array to prevent type widening.
 /**
