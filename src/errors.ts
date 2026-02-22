@@ -1,13 +1,23 @@
 // Join tuple of strings with delimiter
-export type Concantate<
+export type Concatenate<
   Tuple extends string[],
   Separator extends string = "",
-  Rest extends string = ""
+  Rest extends string = "",
 > = Tuple["length"] extends 1
   ? `${Rest}${Tuple[0]}`
   : Tuple extends [infer start extends string, ...infer rest extends string[]]
-  ? Concantate<rest, Separator, `${Rest}${start}${Separator}`>
-  : never;
+    ? Concatenate<rest, Separator, `${Rest}${start}${Separator}`>
+    : never;
+/**
+ * @deprecated
+ * Misspelled
+ */
+export type Concantate<
+  Tuple extends string[],
+  Separator extends string = "",
+  Rest extends string = "",
+> = Concatenate<Tuple, Separator, Rest>;
+
 // Remove functions.
 export type NoFunc<T> = { [K in keyof T]: keyof T };
 // Errors.
@@ -40,13 +50,13 @@ export function createClassifiedError<
   isFatal extends boolean = true,
   oldError extends {
     new (...args: Parameters<error>): InstanceType<oldError>;
-  } = error
+  } = error,
 >(
   reason: reason,
   // @ts-ignore
   oldError: oldError = Error,
   // @ts-ignore
-  isFatal: isFatal = true
+  isFatal: isFatal = true,
 ): NoFunc<oldError> & {
   new (...args: ConstructorParameters<oldError>): Omit<
     InstanceType<oldError>,
@@ -105,7 +115,7 @@ export function createClassifiedError<
   return classifiedError;
 }
 /**
- * @deprecated Use createClassifiedError instead. Removal scheduled for v3, as it is misspelled. 
+ * @deprecated Use createClassifiedError instead. Removal scheduled for v3, as it is misspelled.
  */
 export const createClassifyedError = createClassifiedError;
 
@@ -120,7 +130,7 @@ export const createClassifyedError = createClassifiedError;
 export function errorFuncWrap<assertFunc extends [(...args: any[]) => any]>(
   assertFunc: assertFunc[0],
   customError: { new (message: string): any } = Error,
-  prependErrorWith: string = ""
+  prependErrorWith: string = "",
 ): assertFunc[0] {
   return function wrapped(
     ...args: Parameters<assertFunc[0]>
@@ -129,9 +139,12 @@ export function errorFuncWrap<assertFunc extends [(...args: any[]) => any]>(
       return assertFunc(...args);
     } catch (error) {
       throw new customError(
-        prependErrorWith + (error as { message: string }).message
+        prependErrorWith + (error as { message: string }).message,
       );
     }
   };
 }
+/**
+ * @deprecated
+ */
 export const chickenJVMError = createClassifiedError("ChickenJVM ERROR");
