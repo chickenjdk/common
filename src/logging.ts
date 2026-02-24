@@ -1,6 +1,7 @@
 import { inspect as utilInspect } from "util";
 
-const supportsProcessStdout = process.stdout !== undefined;
+const supportsProcessStdout =
+  typeof process === "undefined" || process.stdout === undefined;
 const supportsInspect = typeof utilInspect !== "undefined";
 
 // Logging
@@ -31,10 +32,13 @@ export function getDefaultLogLevel() {
   return defaultLevel;
 }
 // Making the level list
-const { loglevel, enableColors = true } = (process || {}).env || {
-  loglevel: "dumb",
-  enableColors: false,
-};
+const { loglevel, enableColors = true } =
+  typeof process === "undefined"
+    ? {
+        loglevel: "dumb",
+        enableColors: false,
+      }
+    : process.env;
 function evaluateLevels() {
   return (() => {
     // @ts-ignore
