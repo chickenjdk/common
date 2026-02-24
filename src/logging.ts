@@ -1,4 +1,7 @@
-import { inspect } from "util";
+import { inspect as utilInspect } from "util";
+
+const supportsProcessStdout = process.stdout !== undefined;
+const supportsInspect = typeof utilInspect !== "undefined";
 
 // Logging
 const levelList = ["error", "warning", "log", "verbose", "dumb"] as const;
@@ -9,13 +12,15 @@ const colors: number[] & { length: typeof levelList.length } = [
 let defaultLevel: (typeof levelList)[number] = "log";
 export function setDefaultLogLevel(level: (typeof levelList)[number]) {
   if (levelList.indexOf(level) === -1) {
-    process.nextTick(() =>
-      log(
-        "warning",
-        `Logging level ${level} is unknown. Falling back to full logging (${
-          levelList[levelList.length - 1]
-        })`
-      )
+    setTimeout(
+      () =>
+        log(
+          "warning",
+          `Logging level ${level} is unknown. Falling back to full logging (${
+            levelList[levelList.length - 1]
+          })`,
+        ),
+      0,
     );
     level = levelList[levelList.length - 1];
   }
@@ -26,14 +31,18 @@ export function getDefaultLogLevel() {
   return defaultLevel;
 }
 // Making the level list
-const { loglevel, enableColors = true } = process.env;
+const { loglevel, enableColors = true } = (process || {}).env || {
+  loglevel: "dumb",
+  enableColors: false,
+};
 function evaluateLevels() {
   return (() => {
     // @ts-ignore
     if (levelList.indexOf(loglevel) === -1) {
       if (typeof loglevel !== "undefined") {
-        process.nextTick(() =>
-          log("warning", `Logging level ${loglevel} is unknown`)
+        setTimeout(
+          () => log("warning", `Logging level ${loglevel} is unknown`),
+          0,
         );
       }
       return levelList.slice(0, levelList.indexOf(defaultLevel) + 1);
@@ -41,7 +50,7 @@ function evaluateLevels() {
     return true
       ? levelList.slice(
           0,
-          levelList.indexOf(loglevel as (typeof levelList)[number]) + 1
+          levelList.indexOf(loglevel as (typeof levelList)[number]) + 1,
         )
       : [];
   })();
@@ -58,15 +67,18 @@ let levels = evaluateLevels();
 export function log(
   level: (typeof levelList)[number],
   value: any,
-  inspectValue: boolean = true
+  inspectValue: boolean = true,
 ): void {
+  if (!supportsInspect) {
+    inspectValue = false;
+  }
   if (levels.includes(level)) {
-    process.stdout.write(
+    (supportsProcessStdout ? process.stdout.write : console.log)(
       `[${
         enableColors ? `\x1b[${colors[levels.indexOf(level)]};1m` : ""
       }${level}${enableColors ? "\x1b[0m" : ""}] ${
-        inspectValue ? inspect(value, { colors: true }) : value
-      }\n`
+        inspectValue ? utilInspect(value, { colors: true }) : value
+      }\n`,
     );
   }
   // @ts-ignore

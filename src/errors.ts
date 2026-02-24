@@ -25,7 +25,7 @@ type error = typeof Error;
 const chains: WeakMap<any, [string[], number[]]> = new WeakMap();
 export type pop<T extends any[]> = T extends [any, infer R] ? R : [];
 // Colors!
-const { enableColors = true } = process.env;
+const { enableColors = true } = (process || {}).env || {enableColors: false}
 const colorList = [
   11, 13, 14, 26, 36, 56, 61, 71, 75, 76, 85, 126, 131, 135, 136, 155, 159, 165,
   190, 205, 215, 219, 229,
