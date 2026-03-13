@@ -4,3 +4,4 @@ images/
 node_modules/
 src/
 typedoc.json
+tsconfig.json
