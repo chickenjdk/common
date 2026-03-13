@@ -66,15 +66,22 @@ let levels = evaluateLevels();
  * Log a value. WIll trow and log the value if it is an Error and the isFatal property is true
  * @param level The logging level
  * @param value The value to log. It will be printed in the form reported by util.inspect if inspectValue is not provided and set to false
- * @param [inspectValue=true] If true, use util.inspect to show the value
+ * @param inspectValue= If true, use util.inspect to show the value. False by default for strings and true by default for everything else.
  */
 export function log(
   level: (typeof levelList)[number],
   value: any,
-  inspectValue: boolean = true,
+  inspectValue?: boolean,
 ): void {
   if (!supportsInspect) {
     inspectValue = false;
+  }
+  if (inspectValue === undefined) {
+    if (typeof value === "string") {
+      inspectValue = false;
+    } else {
+      inspectValue = true;
+    }
   }
   if (levels.includes(level)) {
     (supportsProcessStdout ? process.stdout.write : console.log)(
