@@ -1,7 +1,7 @@
 import { inspect as utilInspect } from "util";
 
 const supportsProcessStdout =
-  typeof process === "undefined" || process.stdout === undefined;
+  !(typeof process === "undefined" || process.stdout === undefined);
 const supportsInspect = typeof utilInspect !== "undefined";
 
 // Logging
