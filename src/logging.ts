@@ -84,7 +84,7 @@ export function log(
     }
   }
   if (levels.includes(level)) {
-    (supportsProcessStdout ? process.stdout.write : console.log)(
+    (supportsProcessStdout ? (...args: Parameters<typeof process["stdout"]["write"]>) => process.stdout.write(...args) : console.log)(
       `[${
         enableColors ? `\x1b[${colors[levels.indexOf(level)]};1m` : ""
       }${level}${enableColors ? "\x1b[0m" : ""}] ${
